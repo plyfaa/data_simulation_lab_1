@@ -1,7 +1,7 @@
 ---
 title: "Simulations & Tidyverse lab: Intermediate Version"
 subtitle: "PSYC 201A, Data Simulation Lab 1"
-author: "Your name here"
+author: "Plyfaa Suwanamalik-Murphy"
 date: today
 format:
   html:
@@ -49,7 +49,7 @@ The `rnorm` function is used below here.
 ```{r}
 
 # you can play around with these
-n <- 300 # number of datapoints
+n <- 1000 # number of datapoints
 mu <- 0 # mean of the distribution
 sd_norm <- 1 # sd of the distribution
 
@@ -74,8 +74,8 @@ Calculate some basic summaries of this dataframe and print them out
 
 norm_df_summary <- norm_df |> 
   summarise(
-    mean = mean(___),  # Fill in the column name
-    sd = sd(___),      # Fill in the column name  
+    mean = mean(sim_values),  # Fill in the column name
+    sd = sd(sim_values),      # Fill in the column name  
     n = n()            # This one is already done!
   )
 
@@ -124,7 +124,7 @@ Tasks:
 # TODO: create a simulated dataframe using rbinom (remember, you can look at the help for the function)
 # Hint: Use tibble() and rbinom(n=200, size=1, prob=0.92)
 # Complete this line:
-acc_df <- tibble(acc = rbinom(___, size = ___, prob = ___))
+acc_df <- tibble(acc = rbinom(200, size = 1, prob = 0.92))
 
 
 # TODO: summarise and count
@@ -132,7 +132,7 @@ acc_df <- tibble(acc = rbinom(___, size = ___, prob = ___))
 # Complete this structure:
 acc_df_summary <- acc_df |>
   summarise(
-    prop_correct = mean(___),  # Fill in the column name
+    prop_correct = mean(acc),  # Fill in the column name
     n = n()                    # This one is already done!
   )
 
@@ -140,15 +140,15 @@ acc_df_summary <- acc_df |>
 print(acc_df_summary)
 
 # Count table: how many 0s and 1s?
-acc_df |> count(___)
+acc_df |> count(acc)
 ```
 
 ```{r}
 ## TO DO: Make a histogram of these values
 # Hint: Use ggplot() with geom_histogram()
 # Complete this structure:
-ggplot(___, aes(x = ___)) +  # Fill in dataframe and column name
-  geom_histogram(binwidth = ___, alpha = ___) +  # Choose appropriate values
+ggplot(acc_df, aes(x=acc)) +  # Fill in dataframe and column name
+  geom_histogram(binwidth = 0.25, alpha = 0.85) +  # Choose appropriate values
   labs(title = "Simulated accuracy values", x = "Accuracy", y = "Count")
 ```
 
@@ -162,7 +162,7 @@ ggplot(___, aes(x = ___)) +  # Fill in dataframe and column name
 # You have to give stat_summary an x-value, but since there isn't really one here you can just give it a label (e.g., "overall")
 
 # Complete this structure:
-ggplot(acc_df, aes(x = 'Overall', y = ___)) +  # Fill in the column name
+ggplot(acc_df, aes(x = 'Overall', y = acc)) +  # Fill in the column name
   stat_summary(fun = mean, geom = "point", size = 3) +
   stat_summary(fun.data = mean_se, fun.args = list(mult = 1.96), geom = "errorbar", width = 0.1) +
   labs(x = NULL, y = "Proportion correct", title = "Accuracy")
@@ -186,11 +186,11 @@ Tasks:
 
 # Complete this structure:
 acc2 <- tibble(
-  condition = rep(c("easy", "hard"), each = ___),  # Fill in number of trials per condition
-  block = rep(rep(1:4, each = ___), times = 2),   # Fill in trials per block
+  condition = rep(c("easy", "hard"), each = 100),  # Fill in number of trials per condition
+  block = rep(rep(1:4, each = 25), times = 2),   # Fill in trials per block
   acc = c(
-    rbinom(___, 1, 0.97),  # Fill in number of trials for easy condition
-    rbinom(___, 1, 0.87)   # Fill in number of trials for hard condition
+    rbinom(100, 1, 0.97),  # Fill in number of trials for easy condition
+    rbinom(100, 1, 0.87)   # Fill in number of trials for hard condition
   )
 )
 
@@ -203,9 +203,9 @@ acc2 |>
 # Hint: Use group_by() and summarise()
 # Complete this structure:
 acc_by_cb <- acc2 |>
-  group_by(___, ___) |>  # Fill in grouping variables
+  group_by(condition, block) |>  # Fill in grouping variables
   summarise(
-    prop_correct = mean(___),  # Fill in column name
+    prop_correct = mean(acc),  # Fill in column name
     trials = n(), 
     .groups = "drop"
   )
@@ -215,8 +215,8 @@ acc_by_cb <- acc2 |>
 # Complete this structure:
 acc_wide <- acc_by_cb |>
   pivot_wider(
-    names_from = ___,     # Fill in the column to become column names
-    values_from = ___     # Fill in the column to become values
+    names_from = condition,     # Fill in the column to become column names
+    values_from = prop_correct     # Fill in the column to become values
   )
 
 # View the results
@@ -257,9 +257,9 @@ r_shifted_lognorm <- function(n, t0, meanlog, sdlog) {
 
 # Complete this structure:
 rt_df <- tibble(
-  rt = r_shifted_lognorm(___, t0 = ___, meanlog = ___, sdlog = ___)  # Fill in the parameters
+  rt = r_shifted_lognorm(500, t0 = 300, meanlog = log(250), sdlog = 0.35)  # Fill in the parameters
 ) |>
-  mutate(log_rt = log(___))  # Fill in the column name
+  mutate(log_rt = log(rt))  # Fill in the column name
 
 # Check the first few rows
 head(rt_df)
@@ -270,7 +270,7 @@ Now look at their relationship -- use `ggplot()` with `geom_point()`, putting `r
 ```{r}
 # TODO: Plot rt vs log_rt
 # Hint: ggplot() with geom_point()
-ggplot(rt_df, aes(x = ___, y = ___)) +  # Fill in x and y column names
+ggplot(rt_df, aes(x = rt, y = log_rt)) +  # Fill in x and y column names
   geom_point(alpha = 0.5) +
   labs(x = "RT (ms)", y = "Log RT")
 ```
@@ -292,10 +292,10 @@ OK, now let's make some summaries. Use the summarize function to calculate the m
 # Complete this structure:
 rt_df_summary <- rt_df |>
   summarise(
-    mean_rt = mean(___),    # Fill in column name
-    median_rt = median(___), # Fill in column name
-    max_rt = max(___),      # Fill in column name
-    sd_rt = sd(___)         # Fill in column name
+    mean_rt = mean(rt),    # Fill in column name
+    median_rt = median(rt), # Fill in column name
+    max_rt = max(rt),      # Fill in column name
+    sd_rt = sd(rt)         # Fill in column name
   )
 
 # Print the results
@@ -317,8 +317,8 @@ Add a **condition** factor. Suppose invalid cues slow responses by \~**40 ms** o
 
 # Complete this structure:
 rt_df_valid_invalid <- tibble(
-  rt_valid = r_shifted_lognorm(___, t0 = ___, meanlog = ___, sdlog = ___),     # Fill in parameters for valid condition
-  rt_invalid = r_shifted_lognorm(___, t0 = ___, meanlog = ___, sdlog = ___)   # Fill in parameters for invalid condition (slower)
+  rt_valid = r_shifted_lognorm(500, t0 = 300, meanlog = log(250), sdlog = 0.35), # Fill in parameters for valid condition
+  rt_invalid = r_shifted_lognorm(500, t0 = 300, meanlog = log(290), sdlog = 0.35) # Fill in parameters for invalid condition (slower)
 )
 
 # Check the first few rows
@@ -333,9 +333,9 @@ Use `pivot_longer` to make this a long dataframe, where `rt` is just one column,
 # Complete this structure:
 rt_df_valid_invalid_longer <- rt_df_valid_invalid |>
   pivot_longer(
-    cols = c(___, ___),        # Fill in the column names to pivot
-    values_to = ___,           # Fill in the name for the values column
-    names_to = ___             # Fill in the name for the names column
+    cols = c('rt_valid', 'rt_valid'),        # Fill in the column names to pivot
+    values_to = 'rt',           # Fill in the name for the values column
+    names_to = 'cond'             # Fill in the name for the names column
   )
 
 # Check the first few rows
@@ -350,10 +350,10 @@ Now, use `group_by(condition)` before computing your summaries in tidyverse -- y
 # Hint: Use group_by(condition) then summarise()
 # Complete this structure:
 valid_invalid_summary <- rt_df_valid_invalid_longer |>
-  group_by(___) |>  # Fill in the grouping variable
+  group_by(cond) |>  # Fill in the grouping variable
   summarise(
-    mean_rt = mean(___),  # Fill in column name
-    sd_rt = sd(___),      # Fill in column name
+    mean_rt = mean(rt),  # Fill in column name
+    sd_rt = sd(rt),      # Fill in column name
     n = n()
   )
 
@@ -367,8 +367,8 @@ Now, make some sort of visual of the two distributions. Give the raw dataframe t
 ## TODO: Use ggplot to make density plot of simulated data
 # Hint: Use geom_density() with fill=condition in aes()
 # Complete this structure:
-ggplot(___, aes(x = ___, fill = ___)) +  # Fill in dataframe and column names
-  geom_density(alpha = ___) +            # Fill in alpha value (0-1)
+ggplot(rt_df_valid_invalid_longer, aes(x = rt, fill = cond)) +  # Fill in dataframe and column names
+  geom_density(alpha = 0.5) +            # Fill in alpha value (0-1)
   labs(title = "Cueing Cost as Shift in Distribution", x = "RT (ms)", y = "Density")
 ```
 
@@ -394,12 +394,12 @@ for (i in 1:num_participants) {
   
   # Simulate trials for this participant
   sim_subj <- tibble(
-    participant = ___,
-    condition = rep(c("valid", "invalid"), each = ___),
-    trial = rep(1:___, times = 2),
+    participant = i,
+    condition = rep(c("valid", "invalid"), each = num_trials_per_condition),
+    trial = rep(1:num_trials_per_condition, times = 2),
     rt = c(
-      r_shifted_lognorm(___, t0 = 300 + baseline_shift, meanlog = log(250), sdlog = 0.35),
-      r_shifted_lognorm(___, t0 = 300 + baseline_shift, meanlog = log(290), sdlog = 0.35)
+      r_shifted_lognorm(num_trials_per_condition, t0 = 300 + baseline_shift, meanlog = log(250), sdlog = 0.35),
+      r_shifted_lognorm(num_trials_per_condition, t0 = 300 + baseline_shift, meanlog = log(290), sdlog = 0.35)
     )
   ) |>
     mutate(log_rt = log(rt))
@@ -417,9 +417,9 @@ head(df_experiment)
 # Hint: Use group_by(participant, condition) and summarise()
 # Complete this structure:
 df_experiment_summary <- df_experiment |>
-  group_by(___, ___) |>  # Fill in grouping variables
+  group_by(participant, condition) |>  # Fill in grouping variables
   summarise(
-    mean_rt = mean(___),  # Fill in column name
+    mean_rt = mean(rt),  # Fill in column name
     n_trials = n(),
     .groups = "drop"
   )
@@ -434,9 +434,9 @@ BONUS: Plot average RTs and 95 CIs over individual subjects. You can reuse `stat
 # TODO: Plot average RTs and 95 CIs over individual subjects
 # Hint: Use stat_summary() for means and CIs, geom_point() for individual data
 # Complete this structure:
-ggplot(___, aes(x = ___, y = ___, color = ___, fill = ___)) +  # Fill in dataframe and aesthetics
+ggplot(df_experiment_summary, aes(x = condition, y = mean_rt, color = condition, fill = condition)) +  # Fill in dataframe and aesthetics
   geom_point(alpha = 0.6) +  # Individual subject means
-  geom_line(aes(group = ___), alpha = 0.3, color = 'grey') +  # Connect data from each participant
+  geom_line(aes(group = participant), alpha = 0.3, color = 'grey') +  # Connect data from each participant
   stat_summary(fun = mean, geom = "point", size = 3) +  # Overall mean
   stat_summary(fun.data = mean_se, fun.args = list(mult = 1.96), geom = "errorbar", width = 0.1) +  # 95% CIs
   labs(x = "Condition", y = "Average RT", title = "RT by Simulated Cueing Condition")
